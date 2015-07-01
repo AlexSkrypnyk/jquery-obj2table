@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>jQuery Table from Object tests</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+
+  <script src="../../../../misc/jquery.js"></script>
+  <script src="jquery.obj2table.js"></script>
+</head>
+<body>
+<script>
+  (function ($) {
+
+    var tests = [];
+
+    tests.push({
+      caption: 'Simple example',
+      rows: [
+        ['A11', 'B12', 'C13'],
+        ['A21', 'B22', 'C23'],
+        ['A31', 'B32', 'C33']
+      ]
+    });
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Attributes',
+      attributes: {
+        class: 'class-1 class-2',
+        width: '50%'
+      }
+    })
+    );
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Attributes in rows',
+      rows: [
+        {
+          data: ['A11', 'B12', 'C13'],
+          attributes: {
+            class: 'row-class-1 row-class-2',
+            bgcolor: 'red'
+          }
+        },
+        ['A21', 'B22', 'C23'],
+        ['A31', 'B32', 'C33']
+      ]
+    })
+    );
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Attributes in rows and cells',
+      rows: [
+        {
+          data: [
+            {
+              data: 'A11',
+              attributes: {
+                class: 'row-class-1 row-class-2',
+                bgcolor: 'green'
+              }
+            },
+            'B12',
+            'C13'
+          ],
+          attributes: {
+            class: 'row-class-1 row-class-2',
+            bgcolor: 'red'
+          }
+        },
+        ['A21', 'B22', 'C23'],
+        ['A31', 'B32', 'C33']
+      ]
+    })
+    );
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Caption',
+      header: ['Col1', 'Col2', 'Col3']
+    })
+    );
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Caption with attributes',
+      header: [{
+        data: 'Col1',
+        attributes: {
+          class: 'col-class1 col-class2',
+          width: '50px'
+        }
+      }
+        , 'Col2', 'Co3']
+    })
+    );
+
+
+    tests.push({
+      caption: 'Missing cells - autospan ON',
+      rows: [
+        ['A11', 'B12', 'C13', {
+            data: 'C14',
+            attributes:{
+              bgcolor: 'blue'
+            }
+          }],
+        ['A21', 'B22', 'C23'],
+        ['A31', 'B32', 'C33', 'C34','C35'],
+        ['A41', 'B42', 'C43'],
+        ['A51', 'B52', 'C53']
+      ],
+      autospan: true,
+      attributes: {
+        border: '1'
+      }
+    });
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Missing cells in header - autospan ON',
+      header: ['Col1', 'Col2', 'Col3']
+    })
+    );
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Missing cells in header - autospan ON',
+      header: ['Col1', 'Col2', 'Col3'],
+      zebra: true
+    })
+    );
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Autoincrement',
+      incrementRows:true,
+      incrementCols:true
+    })
+    );
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Autoincrement - custom start',
+      incrementRows:5,
+      incrementCols:10
+    })
+    );
+
+    tests.push($.extend({}, tests[tests.length - 1], {
+      caption: 'Firsts and lasts',
+      columnFirst: 'col-first',
+      columnLast: 'col-last',
+      rowFirst: 'row-first',
+      rowLast: 'row-last'
+    })
+    );
+
+    $(document).ready(function () {
+
+      $.each(tests, function (k, v) {
+        $('body').append($.fn.obj2table(v));
+      });
+
+    });
+
+  })(jQuery);
+
+</script>
+</body>
+</html>
