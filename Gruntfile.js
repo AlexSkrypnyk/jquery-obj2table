@@ -9,6 +9,7 @@
  *
  * Run one of the following commands:
  * grunt
+ * grunt lint
  * grunt test
  * grunt build
  */
@@ -108,7 +109,7 @@ module.exports = function (grunt) {
     // Uglify output.
     uglify: {
       options: {
-        banner: '/* <%= pkg.title %> v@<%= pkg.version %> <%= pkg.homepage %> | License: <%= pkg.license %> */'
+        banner: '/* <%= pkg.title %> v.<%= pkg.version %> <%= pkg.homepage %> | License: <%= pkg.license %> */'
       },
       build: {
         files: [{
@@ -124,27 +125,12 @@ module.exports = function (grunt) {
     }
   });
 
-  /**
-   * Get date of the latest git commit.
-   */
-  function gitCommitDate(fn) {
-    grunt.util.spawn({
-      cmd: 'git',
-      args: ['log', '-1', '--pretty=format:%ad']
-    }, function (error, result) {
-      if (error) {
-        grunt.log.error(error);
-        return fn(error);
-      }
-
-      fn(null, result);
-    });
-  }
-
   // Register tasks.
   //
   // Run all tasks by default.
   grunt.registerTask('default', ['jshint', 'test', 'build', 'compare_size']);
+  // Run code quality check.
+  grunt.registerTask('lint', ['jshint']);
   // Run tests.
   grunt.registerTask('test', ['qunit']);
   // Build distribution.

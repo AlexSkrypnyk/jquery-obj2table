@@ -7,229 +7,280 @@
  * License: @@license
  */
 
-;
-(function ($, window, document, undefined) {
+;(function ($, undefined) {
   "use strict";
-  $.fn.obj2table = function (obj) {
+
+  var pluginName = 'obj2table',
+    version = '@@version';
+
+  $.fn[pluginName] = function (obj, api) {
+    var settings;
+
+    // Default API usage to false.
+    api = api || false;
+
+    // Normalise array of rows.
+    obj = $.isArray(obj) ? {rows: obj} : obj;
+
     // Merge with defaults.
-    obj = $.extend({}, {
+    settings = $.extend({}, {
+      // Table caption.
       caption: '',
-      responsive: false,
+      // Array of table header cells.
       header: [],
+      // Array of table body cells.
       rows: [],
-      attributes: [],
+      // Array of table footer cells.
+      footer: [],
+      // Table attributes object.
+      attributes: {},
+      // Use zebra classes.
       zebra: false,
-      autospan: false,
-      columnFirst: '',
-      columnLast: '',
+      zebraOdd: 'odd',
+      zebraEven: 'even',
+      // First row class.
       rowFirst: '',
+      // First column class.
       rowLast: '',
-      incrementCols: false,
+      // First column class.
+      columnFirst: '',
+      // Last column class.
+      columnLast: '',
+      // Boolean flag to add row increment class.
       incrementRows: false,
+      // Boolean flag to add column increment class.
+      incrementColumns: false,
+      // Boolean flag to render table with no data or string for empty text.
       empty: false,
-      tableTag: 'table',
-      captionTag: 'caption',
-      headTag: 'thead',
-      bodyTag: 'tbody',
-      headCellTag: 'th',
-      rowTag: 'tr',
-      cellTag: 'td'
+      // Boolean flag to automatically span columns if row length is different.
+      autospan: false,
+      // Convert table to responsive: all tags become <div>'s.
+      responsive: false,
+      // Table elements tags.
+      tagTable: 'table',
+      tagCaption: 'caption',
+      tagBody: 'tbody',
+      tagHeader: 'thead',
+      tagHeaderCell: 'th',
+      tagFooter: 'tfoot',
+      tagFooterCell: 'th',
+      tagRow: 'tr',
+      tagCell: 'td'
     }, obj);
 
-    var _createTable = function (obj) {
+    settings.version = version;
+
+    /**
+     * Create table from provided object.
+     */
+    this.createTable = function (s) {
       // Reset all elements to divs if the table is responsive, and prevent auto
       // spanning.
-      if (obj.responsive) {
-        obj.tableTag = obj.captionTag = obj.headTag = obj.bodyTag = obj.rowTag = obj.cellTag = 'div';
+      if (s.responsive) {
+        s.tagTable = s.tagCaption = s.tagBody = s.tagHeader = s.tagHeaderCell = s.tagFooter = s.tagFooterCell = s.tagRow = s.tagCell = 'div';
+        s.autospan = false;
       }
 
       // Return early if there are no rows to display.
-      if (obj.rows.length == 0) {
-        if (obj.empty === false) {
+      if (s.rows.length == 0) {
+        if (s.empty === false) {
           // Do not render anything.
           return '';
         }
-        else if (typeof obj.empty == 'string') {
+        else if (typeof s.empty == 'string') {
           // Render empty text.
-          return obj.empty;
+          return s.empty;
         }
         else {
-          // Boolean true - continue and display table 'as-is'.
+          // Boolean true - add at lease one row and one cell.
+          s.rows.push(['']);
         }
+      }
+
+      // Calculate max columns for header, footer and body to allow set colspan
+      // for cells, if required.
+      if (s.autospan) {
+        s.autospan = this.getMaxColumns([s.rows, s.header, s.footer]);
       }
 
       // Create table.
-      var $table = $('<' + obj.tableTag + '></' + obj.tableTag + '>')
-        .addClass('obj2table-table');
-
-      if (obj.responsive) {
-        $table.addClass('obj2table-responsive');
-      }
+      var $table = $('<' + s.tagTable + '></' + s.tagTable + '>');
+      this.setAttributes($table, s.attributes);
 
       // Create caption.
-      if (obj.caption != '') {
-        $table.append('<' + obj.captionTag + ' class="obj2table-caption">' + obj.caption + '</' + obj.captionTag + '>');
+      if (s.caption != '') {
+        $table.append('<' + s.tagCaption + '>' + s.caption + '</' + s.tagCaption + '>');
       }
 
-      // @todo: Implement this.
-      if (obj.header.length > 0) {
-        var $thead = $('<' + obj.headTag + '></' + obj.headTag + '>')
-          .addClass('obj2table-head');
-        _createRow($thead, obj.header, 'headCellTag', obj);
-        $table.append($thead);
+      // Create header rows, if provided.
+      if (s.header.length > 0) {
+        $table.append(this.createElement(s.tagHeader, this.createRows(s.header, s.tagRow, s.tagHeaderCell, s)));
       }
 
-      // Body.
-      var $tbody = $('<' + obj.bodyTag + '></' + obj.bodyTag + '>')
-        .addClass('obj2table-body');
-      for (var i = 0; i < obj.rows.length; i++) {
-        _createRow($tbody, obj.rows[i], 'cellTag', obj);
+      // Create body rows.
+      $table.append(this.createElement(s.tagBody, this.createRows(s.rows, s.tagRow, s.tagCell, s)));
 
+      // Create foot rows, if provided.
+      if (s.footer.length > 0) {
+        $table.append(this.createElement(s.tagFooter, this.createRows(s.footer, s.tagRow, s.tagFooterCell, s)));
       }
 
-      $table.append($tbody);
-
-      _setAttributes($table, obj.attributes);
-
-      // Add 'cellspan' attribute automatically to the last cell.
-      if (obj.autospan !== false) {
-        _autospan($table, obj.responsive);
-      }
-
-      // Add zebra striping.
-      if (obj.zebra) {
-        $table.find('obj2table-row').each(function (i) {
-          if (i % 2) {
-            $(this).addClass('even');
-          }
-          else {
-            $(this).addClass('odd');
-          }
-        });
-      }
-
-      if (obj.incrementCols !== false || obj.incrementRows) {
-        _increment($table, obj.incrementRows, obj.incrementCols);
-      }
-
-      _markFirstLast($table, obj.rowFirst, obj.rowLast, obj.columnFirst, obj.columnLast);
-
-      // Return table's markup.
+      // Return rendered table markup.
       return $table.wrap('<div/>').parent().html();
     };
 
-    var _createRow = function ($container, value, type, settings) {
-      if (typeof type == 'undefined') {
-        type = 'bodyTag';
-      }
-      var $row = $('<' + settings.rowTag + '></' + settings.rowTag + '>')
-        .attr('class', 'obj2table-row');
-      var rowAttr;
-      if ($.isPlainObject(value)) {
-        if (typeof value.data == 'undefined') {
-          // Malformed object - skip it.
-          return;
-        }
-        rowAttr = typeof value.attributes != 'undefined' ? value.attributes : {};
-        value = value.data;
-        _setAttributes($row, rowAttr);
+    /**
+     * Create rows with specified tags for rows and cells.
+     */
+    this.createRows = function (rows, tagRow, tagCell, settings) {
+      var $rows = $(), $row;
+      for (var i = 0; i < rows.length; i++) {
+        $row = this.createRow(rows[i], tagRow, tagCell, settings);
+        this.setDefaultRowClasses($row, i, rows.length, settings);
+        $.merge($rows, $row);
       }
 
-      for (var j = 0; j < value.length; j++) {
-        _createCell($row, value[j], settings[type]);
-      }
-
-      $container.append($row);
+      return $rows;
     };
 
-    var _createCell = function ($container, value, tag) {
-      if (typeof tag == 'undefined') {
-        tag = 'td';
+    /**
+     * Create a single row with specified tags for rows and cells.
+     */
+    this.createRow = function (row, tagRow, tagCell, settings) {
+      row = this.normaliseDataNode(row);
+      var $row = this.createElement(tagRow), $cell;
+
+      for (var i = 0; i < row.data.length; i++) {
+        $cell = this.createCell(row.data[i], tagCell);
+        this.setDefaultCellClasses($cell, i, row.data.length, settings);
+
+        this.setCellAutospan($cell, i, row.data.length, settings);
+
+        $row.append($cell);
       }
 
-      var $cell = $('<' + tag + '></' + tag + '>');
-      var cell = value;
-      var cellAttr;
-      if ($.isPlainObject(value)) {
-        if (typeof value.data == 'undefined') {
-          // Malformed object - skip it.
-          return;
-        }
-        cell = value.data;
-        cellAttr = typeof value.attributes != 'undefined' ? value.attributes : {};
-        _setAttributes($cell, cellAttr);
+      $row.setAttributes($row, row.attributes);
 
-        $cell.addClass('obj2table-cell');
-      }
-      // Insert value.
-      $cell.html(cell);
-      $container.append($cell);
+      return $row;
     };
 
-    var _setAttributes = function ($el, attr) {
-      if (typeof $el != 'undefined' && typeof attr != 'undefined' && attr.length != 0) {
-        for (var attr_name in attr) {
-          $el.attr(attr_name, attr[attr_name]);
-        }
-      }
+    /**
+     * Create a single cell with specified tag and data
+     */
+    this.createCell = function (value, tagCell) {
+      // Normalise node data to become an expected object.
+      value = this.normaliseDataNode(value);
+      var $cell = this.createElement(tagCell);
+
+      $cell.html(value.data);
+      this.setAttributes($cell, value.attributes);
+
+      return $cell;
     };
 
-    // Autospan does not run on responsive tables.
-    var _autospan = function ($table) {
-      var headCount = $table.find('thead tr th').length;
-      // Assess max cells count per row.
-      var rowsMax = 0;
-      var $rows = $table.find('tbody tr');
-      for (var r = 0; r < $rows.length; r++) {
-        rowsMax = Math.max(rowsMax, $rows.eq(r).find('td').length);
-      }
-
-      if (headCount > 0 && headCount < rowsMax) {
-        $table.find('thead tr th:last').attr('colspan', rowsMax - headCount + 1);
-      }
-
-      for (var r = 0; r < $rows.length; r++) {
-        var l = $rows.eq(r).find('td').length;
-        if (l < rowsMax) {
-          $table.find('tbody tr td:last').attr('colspan', rowsMax - headCount);
-        }
-        $rows.eq(r).find('td:last').attr('colspan', rowsMax - l + 1);
-      }
-    };
-
-    var _markFirstLast = function ($table, rowsFirst, rowsLast, colsFirst, colsLast) {
-      $table.find('thead tr:first, tbody tr:first').addClass(rowsFirst);
-      $table.find('thead tr:last, tbody tr:last').addClass(rowsLast);
-      $table.find('thead tr, tbody tr').each(function () {
-        $(this).find('th:first, td:first').addClass(colsFirst);
-        $(this).find('th:last, td:last').addClass(colsLast);
-      });
-    };
-
-    var _increment = function ($table, rows, cols) {
-      $table.find('.obj2table-head .obj2table-row').each(function (i) {
-        if (rows !== false) {
-          $(this).addClass('row-' + (i + (rows === true ? 0 : rows)));
-        }
-        $(this).find('.obj2table-cell').each(function (i) {
-          if (cols !== false) {
-            $(this).addClass('col-' + (i + (cols === true ? 0 : cols)));
+    /**
+     * Set attributes for provided element.
+     */
+    this.setAttributes = function ($el, attibutes) {
+      if (typeof $el !== 'undefined' && typeof attibutes != 'undefined' && attibutes.length != 0) {
+        for (var attribute in attibutes) {
+          if (attibutes.hasOwnProperty(attribute)) {
+            $el.attr(attribute, attibutes[attribute]);
           }
-        });
-      });
-
-      $table.find('.obj2table-body .obj2table-row').each(function (i) {
-        if (rows !== false) {
-          $(this).addClass('row-' + (i + (rows === true ? 0 : rows)));
         }
-        $(this).find('.obj2table-cell').each(function (i) {
-          if (cols !== false) {
-            $(this).addClass('col-' + (i + (cols === true ? 0 : cols)));
-          }
-        });
-      });
+      }
     };
 
-    return _createTable(obj);
+    /**
+     * Create jQuery element with specified tag and value.
+     */
+    this.createElement = function (tagName, value) {
+      value = value || '';
+      return $('<' + tagName + '></' + tagName + '>').append(value);
+    };
+
+    /**
+     * Normalise data node to contain 'data' and 'attributes' fields.
+     */
+    this.normaliseDataNode = function (node) {
+      if ($.isPlainObject(node)) {
+        node.data = typeof node.data === 'undefined' ? '' : node.data;
+        node.attributes = typeof node.attributes === 'undefined' ? {} : node.attributes;
+      }
+      else {
+        node = {
+          data: node,
+          attributes: {}
+        };
+      }
+
+      return node;
+    };
+
+    /**
+     * Set default css classes for a row.
+     */
+    this.setDefaultRowClasses = function ($el, index, total, settings) {
+      if (settings.incrementRows) {
+        $el.addClass('row-' + (index + 1).toString());
+      }
+
+      if (index === 0) {
+        $el.addClass(settings.rowFirst)
+      }
+
+      if (index === total - 1) {
+        $el.addClass(settings.rowLast);
+      }
+
+      if (settings.zebra) {
+        $el.addClass(index % 2 ? settings.zebraEven : settings.zebraOdd);
+      }
+    };
+
+    /**
+     * Set default css classes for a cell.
+     */
+    this.setDefaultCellClasses = function ($el, index, total, settings) {
+      if (settings.incrementColumns) {
+        $el.addClass('column-' + (index + 1).toString());
+      }
+
+      if (index === 0) {
+        $el.addClass(settings.columnFirst)
+      }
+
+      if (index === total - 1) {
+        $el.addClass(settings.columnLast);
+      }
+    };
+
+    /**
+     * Get max columns across all tables, provided as arguments.
+     */
+    this.getMaxColumns = function (arrays) {
+      var maxCols = 0, i, j;
+      for (i = 0; i < arrays.length; i++) {
+        for (j = 0; j < arrays[i].length; j++) {
+          maxCols = Math.max(maxCols, arrays[i][j].length);
+        }
+      }
+
+      return maxCols;
+    };
+
+    /**
+     * Set autospan value for specified cell element.
+     *
+     * Autospan does not run on responsive tables.
+     */
+    this.setCellAutospan = function ($el, index, total, settings) {
+      if (settings.autospan && index === total - 1 && total < settings.autospan) {
+        $el.attr('colspan', settings.autospan - total + 1);
+      }
+    };
+
+    // Return current plugin object or rendered table markup.
+    return api ? this : this.createTable(settings);
   };
-}(jQuery, window, document));
+}(jQuery));
