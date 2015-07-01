@@ -33,6 +33,28 @@ to this
   </tbody>
 </table>
 ```
+to produce this table
+
+<table class="obj2table-table">
+  <tbody class="obj2table-body">
+  <tr class="obj2table-row">
+    <td>A11</td>
+    <td>B12</td>
+    <td>C13</td>
+  </tr>
+  <tr class="obj2table-row">
+    <td>A21</td>
+    <td>B22</td>
+    <td>C23</td>
+  </tr>
+  <tr class="obj2table-row">
+    <td>A31</td>
+    <td>B32</td>
+    <td>C33</td>
+  </tr>
+  </tbody>
+</table>
+
 ## Or this
 ```javascript
 {
@@ -91,3 +113,37 @@ to this
   </tbody>
 </table>
 ```
+to produce this more advance table
+<table class="obj2table-table" border="1">
+  <caption class="obj2table-caption">Missing cells - autospan ON</caption>
+  <tbody class="obj2table-body">
+  <tr class="obj2table-row">
+    <td>A11</td>
+    <td>B12</td>
+    <td>C13</td>
+    <td bgcolor="blue" class="obj2table-cell" colspan="2">C14</td>
+  </tr>
+  <tr class="obj2table-row">
+    <td>A21</td>
+    <td>B22</td>
+    <td colspan="3">C23</td>
+  </tr>
+  <tr class="obj2table-row">
+    <td>A31</td>
+    <td>B32</td>
+    <td>C33</td>
+    <td>C34</td>
+    <td colspan="1">C35</td>
+  </tr>
+  <tr class="obj2table-row">
+    <td>A41</td>
+    <td>B42</td>
+    <td colspan="3">C43</td>
+  </tr>
+  <tr class="obj2table-row">
+    <td>A51</td>
+    <td>B52</td>
+    <td colspan="3">C53</td>
+  </tr>
+  </tbody>
+</table>
