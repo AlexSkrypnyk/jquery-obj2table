@@ -1,6 +1,6 @@
 # jquery-obj2table [![Build Status](https://travis-ci.org/alexdesignworks/jquery-obj2table.svg)](https://travis-ci.org/alexdesignworks/jquery-obj2table) [![Code Climate](https://codeclimate.com/github/alexdesignworks/jquery-obj2table/badges/gpa.svg)](https://codeclimate.com/github/alexdesignworks/jquery-obj2table)
 
-## Converts this
+Converts this
 
 ```javascript
 {
@@ -13,49 +13,49 @@
 ```
 to this
 ```html
-<table class="obj2table-table">
-  <tbody class="obj2table-body">
-  <tr class="obj2table-row">
-    <td>A11</td>
-    <td>B12</td>
-    <td>C13</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A21</td>
-    <td>B22</td>
-    <td>C23</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A31</td>
-    <td>B32</td>
-    <td>C33</td>
-  </tr>
+<table>
+  <tbody>
+    <tr>
+      <td>A11</td>
+      <td>B12</td>
+      <td>C13</td>
+    </tr>
+    <tr>
+      <td>A21</td>
+      <td>B22</td>
+      <td>C23</td>
+    </tr>
+    <tr>
+      <td>A31</td>
+      <td>B32</td>
+      <td>C33</td>
+    </tr>
   </tbody>
 </table>
 ```
 to produce this table
 
-<table class="obj2table-table">
-  <tbody class="obj2table-body">
-  <tr class="obj2table-row">
-    <td>A11</td>
-    <td>B12</td>
-    <td>C13</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A21</td>
-    <td>B22</td>
-    <td>C23</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A31</td>
-    <td>B32</td>
-    <td>C33</td>
-  </tr>
+<table>
+  <tbody>
+    <tr>
+      <td>A11</td>
+      <td>B12</td>
+      <td>C13</td>
+    </tr>
+    <tr>
+      <td>A21</td>
+      <td>B22</td>
+      <td>C23</td>
+    </tr>
+    <tr>
+      <td>A31</td>
+      <td>B32</td>
+      <td>C33</td>
+    </tr>
   </tbody>
 </table>
 
-## Or this
+Or this
 ```javascript
 {
   caption: 'Missing cells - autospan ON',
@@ -71,80 +71,87 @@ to produce this table
     ['A41', 'B42', 'C43'],
     ['A51', 'B52', 'C53']
   ],
-  autospan: true,
   attributes: {
     border: '1'
-  }
+  },
+  autospan: true,
+  incrementRows: true,
+  incrementColumns: true,
+  zebra: true,
+  rowFirst: 'row-first',
+  rowLast: 'row-last',
+  columnFirst: 'column-first',
+  columnLast: 'column-last'
 }
 ```
 to this
-```html
-<table class="obj2table-table" border="1">
-  <caption class="obj2table-caption">Missing cells - autospan ON</caption>
-  <tbody class="obj2table-body">
-  <tr class="obj2table-row">
-    <td>A11</td>
-    <td>B12</td>
-    <td>C13</td>
-    <td bgcolor="blue" class="obj2table-cell" colspan="2">C14</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A21</td>
-    <td>B22</td>
-    <td colspan="3">C23</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A31</td>
-    <td>B32</td>
-    <td>C33</td>
-    <td>C34</td>
-    <td colspan="1">C35</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A41</td>
-    <td>B42</td>
-    <td colspan="3">C43</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A51</td>
-    <td>B52</td>
-    <td colspan="3">C53</td>
-  </tr>
+```
+<table border="1">
+  <caption>Missing cells - autospan ON</caption>
+  <tbody>
+    <tr class="row-1 row-first odd">
+      <td class="column-1 column-first">A11</td>
+      <td class="column-2">B12</td>
+      <td class="column-3">C13</td>
+      <td bgcolor="blue" class="column-4 column-last" colspan="2">C14</td>
+    </tr>
+    <tr class="row-2 even">
+      <td class="column-1 column-first">A21</td>
+      <td class="column-2">B22</td>
+      <td class="column-3 column-last" colspan="3">C23</td>
+    </tr>
+    <tr class="row-3 odd">
+      <td class="column-1 column-first">A31</td>
+      <td class="column-2">B32</td>
+      <td class="column-3">C33</td>
+      <td class="column-4">C34</td>
+      <td class="column-5 column-last">C35</td>
+    </tr>
+    <tr class="row-4 even">
+      <td class="column-1 column-first">A41</td>
+      <td class="column-2">B42</td>
+      <td class="column-3 column-last" colspan="3">C43</td>
+    </tr>
+    <tr class="row-5 row-last odd">
+      <td class="column-1 column-first">A51</td>
+      <td class="column-2">B52</td>
+      <td class="column-3 column-last" colspan="3">C53</td>
+    </tr>
   </tbody>
 </table>
 ```
 to produce this more advance table
-<table class="obj2table-table" border="1">
-  <caption class="obj2table-caption">Missing cells - autospan ON</caption>
-  <tbody class="obj2table-body">
-  <tr class="obj2table-row">
-    <td>A11</td>
-    <td>B12</td>
-    <td>C13</td>
-    <td bgcolor="blue" class="obj2table-cell" colspan="2">C14</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A21</td>
-    <td>B22</td>
-    <td colspan="3">C23</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A31</td>
-    <td>B32</td>
-    <td>C33</td>
-    <td>C34</td>
-    <td colspan="1">C35</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A41</td>
-    <td>B42</td>
-    <td colspan="3">C43</td>
-  </tr>
-  <tr class="obj2table-row">
-    <td>A51</td>
-    <td>B52</td>
-    <td colspan="3">C53</td>
-  </tr>
+<table border="1">
+  <caption>Missing cells - autospan ON</caption>
+  <tbody>
+    <tr class="row-1 row-first odd">
+      <td class="column-1 column-first">A11</td>
+      <td class="column-2">B12</td>
+      <td class="column-3">C13</td>
+      <td bgcolor="blue" class="column-4 column-last" colspan="2">C14</td>
+    </tr>
+    <tr class="row-2 even">
+      <td class="column-1 column-first">A21</td>
+      <td class="column-2">B22</td>
+      <td class="column-3 column-last" colspan="3">C23</td>
+    </tr>
+    <tr class="row-3 odd">
+      <td class="column-1 column-first">A31</td>
+      <td class="column-2">B32</td>
+      <td class="column-3">C33</td>
+      <td class="column-4">C34</td>
+      <td class="column-5 column-last">C35</td>
+    </tr>
+    <tr class="row-4 even">
+      <td class="column-1 column-first">A41</td>
+      <td class="column-2">B42</td>
+      <td class="column-3 column-last" colspan="3">C43</td>
+    </tr>
+    <tr class="row-5 row-last odd">
+      <td class="column-1 column-first">A51</td>
+      <td class="column-2">B52</td>
+      <td class="column-3 column-last" colspan="3">C53</td>
+    </tr>
   </tbody>
 </table>
 
