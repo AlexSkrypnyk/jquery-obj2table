@@ -48,6 +48,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-git-authors');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-qunit');
 
   grunt.initConfig({
@@ -63,9 +64,25 @@ module.exports = function (grunt) {
       all: config.files
     },
 
+    // Use 'connect plugin' to start ad-hoc server for tasks like qunit.
+    connect: {
+      server: {
+        options: {
+          port: 8000,
+          base: '.'
+        }
+      }
+    },
+
     // Run QUnit.
     qunit: {
-      files: config.test + '/index.html'
+      all: {
+        options: {
+          urls: [
+            'http://localhost:8000/' + config.test + '/index.html'
+          ]
+        }
+      }
     },
 
     replace: {
@@ -129,7 +146,7 @@ module.exports = function (grunt) {
   // Run code quality check.
   grunt.registerTask('lint', ['jshint']);
   // Run tests.
-  grunt.registerTask('test', ['qunit']);
+  grunt.registerTask('test', ['connect', 'qunit']);
   // Build distribution.
   grunt.registerTask('build', ['replace', 'uglify']);
 };
