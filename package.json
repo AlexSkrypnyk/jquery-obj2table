@@ -2,7 +2,7 @@
   "name": "jquery-obj2table",
   "title": "obj2table jQuery plugin",
   "description": "jQuery plugin to generate table from JavaScript object.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "homepage": "https://github.com/alexdesignworks/jquery-obj2table",
   "author": {
     "name": "Alex Skrypnyk",

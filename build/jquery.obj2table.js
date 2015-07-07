@@ -2,17 +2,16 @@
  * obj2table jQuery plugin
  * jQuery plugin to generate table from JavaScript object.
  *
- * Version: 0.0.1
+ * Version: 1.0.0
  * Author: Alex Skrypnyk (alex.designworks@gmail.com)
  * License: GPL-2.0
  */
 
-;
-(function ($, undefined) {
+;(function ($, undefined) {
   "use strict";
 
   var pluginName = 'obj2table',
-    version = '0.0.1';
+    version = '1.0.0';
 
   $.fn[pluginName] = function (obj, api) {
     var settings;
