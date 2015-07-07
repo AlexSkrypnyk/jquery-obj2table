@@ -147,3 +147,52 @@ to produce this more advance table
   </tr>
   </tbody>
 </table>
+
+## Configuration options
+
+```javascript
+{
+  // Table caption.
+  caption: '',
+  // Array of table header cells.
+  header: [],
+  // Array of table body cells.
+  rows: [],
+  // Array of table footer cells.
+  footer: [],
+  // Table attributes object.
+  attributes: {},
+  // Use zebra classes.
+  zebra: false,
+  zebraOdd: 'odd',
+  zebraEven: 'even',
+  // First row class.
+  rowFirst: '',
+  // First column class.
+  rowLast: '',
+  // First column class.
+  columnFirst: '',
+  // Last column class.
+  columnLast: '',
+  // Boolean flag to add row increment class.
+  incrementRows: false,
+  // Boolean flag to add column increment class.
+  incrementColumns: false,
+  // Boolean flag to render table with no data or string for empty text.
+  empty: false,
+  // Boolean flag to automatically span columns if row length is different.
+  autospan: false,
+  // Convert table to responsive: all tags become <div>'s.
+  responsive: false,
+  // Table elements tags.
+  tagTable: 'table',
+  tagCaption: 'caption',
+  tagBody: 'tbody',
+  tagHeader: 'thead',
+  tagHeaderCell: 'th',
+  tagFooter: 'tfoot',
+  tagFooterCell: 'th',
+  tagRow: 'tr',
+  tagCell: 'td'
+}
+```      
