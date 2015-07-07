@@ -1,4 +1,4 @@
-# jquery-obj2table [![Build Status](https://travis-ci.org/alexdesignworks/jquery-obj2table.svg)](https://travis-ci.org/alexdesignworks/jquery-obj2table)
+# jquery-obj2table [![Build Status](https://travis-ci.org/alexdesignworks/jquery-obj2table.svg)](https://travis-ci.org/alexdesignworks/jquery-obj2table) [![Code Climate](https://codeclimate.com/github/alexdesignworks/jquery-obj2table/badges/gpa.svg)](https://codeclimate.com/github/alexdesignworks/jquery-obj2table)
 
 ## Converts this
 
