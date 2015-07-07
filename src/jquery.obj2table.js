@@ -7,8 +7,8 @@
  * License: @@license
  */
 
-;(function ($, undefined) {
-  "use strict";
+(function ($, undefined) {
+  'use strict';
 
   var pluginName = 'obj2table',
     version = '@@version';
@@ -82,12 +82,12 @@
       }
 
       // Return early if there are no rows to display.
-      if (s.rows.length == 0) {
+      if (s.rows.length === 0) {
         if (s.empty === false) {
           // Do not render anything.
           return '';
         }
-        else if (typeof s.empty == 'string') {
+        else if (typeof s.empty === 'string') {
           // Render empty text.
           return s.empty;
         }
@@ -108,7 +108,7 @@
       this.setAttributes($table, s.attributes);
 
       // Create caption.
-      if (s.caption != '') {
+      if (s.caption !== '') {
         $table.append('<' + s.tagCaption + '>' + s.caption + '</' + s.tagCaption + '>');
       }
 
@@ -133,8 +133,8 @@
      * Create rows with specified tags for rows and cells.
      */
     this.createRows = function (rows, tagRow, tagCell, settings) {
-      var $rows = $(), $row;
-      for (var i = 0; i < rows.length; i++) {
+      var $rows = $(), $row, i;
+      for (i = 0; i < rows.length; i++) {
         $row = this.createRow(rows[i], tagRow, tagCell, settings);
         this.setDefaultRowClasses($row, i, rows.length, settings);
         $.merge($rows, $row);
@@ -147,10 +147,10 @@
      * Create a single row with specified tags for rows and cells.
      */
     this.createRow = function (row, tagRow, tagCell, settings) {
+      var $row = this.createElement(tagRow), $cell, i;
       row = this.normaliseDataNode(row);
-      var $row = this.createElement(tagRow), $cell;
 
-      for (var i = 0; i < row.data.length; i++) {
+      for (i = 0; i < row.data.length; i++) {
         $cell = this.createCell(row.data[i], tagCell);
         this.setDefaultCellClasses($cell, i, row.data.length, settings);
 
@@ -182,7 +182,7 @@
      * Set attributes for provided element.
      */
     this.setAttributes = function ($el, attibutes) {
-      if (typeof $el !== 'undefined' && typeof attibutes != 'undefined' && attibutes.length != 0) {
+      if (typeof $el !== 'undefined' && typeof attibutes !== 'undefined' && attibutes.length !== 0) {
         for (var attribute in attibutes) {
           if (attibutes.hasOwnProperty(attribute)) {
             $el.attr(attribute, attibutes[attribute]);
@@ -226,7 +226,7 @@
       }
 
       if (index === 0) {
-        $el.addClass(settings.rowFirst)
+        $el.addClass(settings.rowFirst);
       }
 
       if (index === total - 1) {
@@ -247,7 +247,7 @@
       }
 
       if (index === 0) {
-        $el.addClass(settings.columnFirst)
+        $el.addClass(settings.columnFirst);
       }
 
       if (index === total - 1) {
