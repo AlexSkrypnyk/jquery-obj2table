@@ -35,14 +35,11 @@ module.exports = function (grunt) {
   };
 
   // Expand app files from source dir if they were not specified in config.
-  config.appFiles = config.appFiles || grunt.file.expand({cwd: config.src}, '**/*');
+  config.appFiles = config.appFiles || grunt.file.expand(config.src + '/*');
   // Define output filename as a first available file, or 'app' if no files.
   config.outputName = (config.outputName || config.appFiles[0].replace(config.src + '/', '').replace('.js', '') + '.js' || 'app.js');
   // Merge all files.
   config.files = config.utilFiles.concat(config.appFiles);
-  //
-  //grunt.log.write(JSON.stringify(config.outputName));
-  //return;
 
   // Load requried tasks.
   grunt.loadNpmTasks('grunt-bowercopy');
