@@ -521,6 +521,13 @@
     assert.ok(typeof api === 'string', 'Return API is an string when not explicitly set');
   });
 
+  test('Settings', function (assert) {
+    var api = $.fn.obj2table({}, true);
+
+    assert.ok($.isPlainObject(api.settings), 'Settings is available through API');
+    assert.ok(typeof api.settings.version === 'string', 'Settings value are available through API');
+  });
+
   test('getMaxColumns', function (assert) {
     var api = $.fn.obj2table({}, true),
       header, rows, footer;

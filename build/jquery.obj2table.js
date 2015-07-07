@@ -71,30 +71,14 @@
     settings.version = version;
 
     /**
-     * Create table from provided object.
+     * Process settings.
      */
-    this.createTable = function (s) {
+    this.processSettings = function (s) {
       // Reset all elements to divs if the table is responsive, and prevent auto
       // spanning.
       if (s.responsive) {
         s.tagTable = s.tagCaption = s.tagBody = s.tagHeader = s.tagHeaderCell = s.tagFooter = s.tagFooterCell = s.tagRow = s.tagCell = 'div';
         s.autospan = false;
-      }
-
-      // Return early if there are no rows to display.
-      if (s.rows.length === 0) {
-        if (s.empty === false) {
-          // Do not render anything.
-          return '';
-        }
-        else if (typeof s.empty === 'string') {
-          // Render empty text.
-          return s.empty;
-        }
-        else {
-          // Boolean true - add at lease one row and one cell.
-          s.rows.push(['']);
-        }
       }
 
       // Calculate max columns for header, footer and body to allow set colspan
@@ -103,40 +87,72 @@
         s.autospan = this.getMaxColumns([s.rows, s.header, s.footer]);
       }
 
+      this.settings = s;
+    };
+
+    /**
+     * Create table from provided object.
+     */
+    this.createTable = function () {
+      var $table, sectionMap, key, s = this.settings;
+
       // Create table.
-      var $table = $('<' + s.tagTable + '></' + s.tagTable + '>');
+      $table = this.createElement(s.tagTable);
       this.setAttributes($table, s.attributes);
 
-      // Create caption.
-      if (s.caption !== '') {
-        $table.append('<' + s.tagCaption + '>' + s.caption + '</' + s.tagCaption + '>');
-      }
+      // Create table caption.
+      this.createCaption($table);
 
-      // Create header rows, if provided.
-      if (s.header.length > 0) {
-        $table.append(this.createElement(s.tagHeader, this.createRows(s.header, s.tagRow, s.tagHeaderCell, s)));
-      }
+      // Map of table sections: header, body and footer.
+      sectionMap = {
+        header: {
+          tag: s.tagHeader,
+          tagRow: s.tagRow,
+          tagCell: s.tagHeaderCell,
+          data: s.header
+        },
+        body: {
+          tag: s.tagBody,
+          tagRow: s.tagRow,
+          tagCell: s.tagCell,
+          data: s.rows
+        },
+        footer: {
+          tag: s.tagFooter,
+          tagRow: s.tagRow,
+          tagCell: s.tagFooterCell,
+          data: s.footer
+        }
+      };
 
-      // Create body rows.
-      $table.append(this.createElement(s.tagBody, this.createRows(s.rows, s.tagRow, s.tagCell, s)));
-
-      // Create foot rows, if provided.
-      if (s.footer.length > 0) {
-        $table.append(this.createElement(s.tagFooter, this.createRows(s.footer, s.tagRow, s.tagFooterCell, s)));
+      // Create table sections from the provided section map.
+      for (key in sectionMap) {
+        if (sectionMap.hasOwnProperty(key) && sectionMap[key].data.length > 0) {
+          $table.append(this.createElement(sectionMap[key].tag, this.createRows(sectionMap[key].data, sectionMap[key].tagRow, sectionMap[key].tagCell)));
+        }
       }
 
       // Return rendered table markup.
-      return $table.wrap('<div/>').parent().html();
+      return this.renderElement($table);
+    };
+
+    /**
+     * Create table caption.
+     */
+    this.createCaption = function ($table) {
+      if (this.settings.caption !== '') {
+        $table.append(this.createElement(this.settings.tagCaption, this.settings.caption));
+      }
     };
 
     /**
      * Create rows with specified tags for rows and cells.
      */
-    this.createRows = function (rows, tagRow, tagCell, settings) {
+    this.createRows = function (rows, tagRow, tagCell) {
       var $rows = $(), $row, i;
       for (i = 0; i < rows.length; i++) {
-        $row = this.createRow(rows[i], tagRow, tagCell, settings);
-        this.setDefaultRowClasses($row, i, rows.length, settings);
+        $row = this.createRow(rows[i], tagRow, tagCell);
+        this.setDefaultRowClasses($row, i, rows.length);
         $.merge($rows, $row);
       }
 
@@ -146,15 +162,15 @@
     /**
      * Create a single row with specified tags for rows and cells.
      */
-    this.createRow = function (row, tagRow, tagCell, settings) {
+    this.createRow = function (row, tagRow, tagCell) {
       var $row = this.createElement(tagRow), $cell, i;
       row = this.normaliseDataNode(row);
 
       for (i = 0; i < row.data.length; i++) {
         $cell = this.createCell(row.data[i], tagCell);
-        this.setDefaultCellClasses($cell, i, row.data.length, settings);
+        this.setDefaultCellClasses($cell, i, row.data.length);
 
-        this.setCellAutospan($cell, i, row.data.length, settings);
+        this.setCellAutospan($cell, i, row.data.length);
 
         $row.append($cell);
       }
@@ -200,6 +216,13 @@
     };
 
     /**
+     * Get element's rendered markup.
+     */
+    this.renderElement = function ($el) {
+      return $el.wrap('<div/>').parent().html();
+    };
+
+    /**
      * Normalise data node to contain 'data' and 'attributes' fields.
      */
     this.normaliseDataNode = function (node) {
@@ -220,38 +243,42 @@
     /**
      * Set default css classes for a row.
      */
-    this.setDefaultRowClasses = function ($el, index, total, settings) {
-      if (settings.incrementRows) {
+    this.setDefaultRowClasses = function ($el, index, total) {
+      var s = this.settings;
+
+      if (s.incrementRows) {
         $el.addClass('row-' + (index + 1).toString());
       }
 
       if (index === 0) {
-        $el.addClass(settings.rowFirst);
+        $el.addClass(s.rowFirst);
       }
 
       if (index === total - 1) {
-        $el.addClass(settings.rowLast);
+        $el.addClass(s.rowLast);
       }
 
       if (settings.zebra) {
-        $el.addClass(index % 2 ? settings.zebraEven : settings.zebraOdd);
+        $el.addClass(index % 2 ? s.zebraEven : s.zebraOdd);
       }
     };
 
     /**
      * Set default css classes for a cell.
      */
-    this.setDefaultCellClasses = function ($el, index, total, settings) {
-      if (settings.incrementColumns) {
+    this.setDefaultCellClasses = function ($el, index, total) {
+      var s = this.settings;
+
+      if (s.incrementColumns) {
         $el.addClass('column-' + (index + 1).toString());
       }
 
       if (index === 0) {
-        $el.addClass(settings.columnFirst);
+        $el.addClass(s.columnFirst);
       }
 
       if (index === total - 1) {
-        $el.addClass(settings.columnLast);
+        $el.addClass(s.columnLast);
       }
     };
 
@@ -274,13 +301,34 @@
      *
      * Autospan does not run on responsive tables.
      */
-    this.setCellAutospan = function ($el, index, total, settings) {
-      if (settings.autospan && index === total - 1 && total < settings.autospan) {
-        $el.attr('colspan', settings.autospan - total + 1);
+    this.setCellAutospan = function ($el, index, total) {
+      if (this.settings.autospan && index === total - 1 && total < this.settings.autospan) {
+        $el.attr('colspan', this.settings.autospan - total + 1);
       }
     };
 
-    // Return current plugin object or rendered table markup.
-    return api ? this : this.createTable(settings);
+    /**
+     * Render empty table result.
+     */
+    this.renderEmpty = function () {
+      if (this.settings.empty === false) {
+        // Do not render anything.
+        return '';
+      }
+      else if (typeof this.settings.empty === 'string') {
+        // Render empty text.
+        return this.settings.empty;
+      }
+      else {
+        // Boolean true - add at least one row and one cell.
+        this.settings.rows.push(['']);
+        return this.createTable();
+      }
+    };
+
+    // Process settings.
+    this.processSettings(settings);
+
+    return api ? this : (this.settings.rows.length === 0 ? this.renderEmpty() : this.createTable());
   };
 }(jQuery));
